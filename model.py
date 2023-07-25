@@ -69,13 +69,8 @@ class LLAMA2_WRAPPER:
         self, message: str, chat_history: list[tuple[str, str]], system_prompt: str
     ) -> int:
         prompt = get_prompt(message, chat_history, system_prompt)
-
-        if self.config.get("llama_cpp"):
-            input_ids = self.model.tokenize(bytes(prompt, "utf-8"))
-            return len(input_ids)
-        else:
-            input_ids = self.tokenizer([prompt], return_tensors="np")["input_ids"]
-            return input_ids.shape[-1]
+        input_ids = self.model.tokenize(bytes(prompt, "utf-8")) if self.config.get("llama_cpp") else self.tokenizer([prompt], return_tensors="np")["input_ids"]
+        return len(input_ids) if self.config.get("llama_cpp") else input_ids.shape[-1]
 
     def run(
         self,
